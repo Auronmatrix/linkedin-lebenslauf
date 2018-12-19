@@ -1,0 +1,44 @@
+<html>
+<head>
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+    <link rel="stylesheet" href="//cdn.rawgit.com/necolas/normalize.css/master/normalize.css">
+    <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+    <div id="app" class="container" style="margin-top: 30px">
+        <h2>LinkedIn > Lebenslauf</h2>
+        <a class="button" href='/auth'>Authorize</a>
+        <button :disabled="!isAuthorized" v-on:click="loadProfile">Load profile</button>
+        <pre> {{ profile }}</pre>
+    </div>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                profile: {},
+                isAuthorized: false
+            },
+            methods: {
+                loadProfile: function () {
+                    fetch('/profile').then(res => res.json()).then(res => {
+                        this.profile = res
+                    })
+                },
+                checkAuth: function () {
+                    fetch('/isAuthorized')
+                        .then(res => res.json())
+                        .then(res => {
+                            this.isAuthorized = res.isAuthorized
+                            window.clearInterval(authCheckInterval)
+                        })
+                }
+            }
+        })
+
+        var authCheckInterval = window.setInterval(app.checkAuth, 1000)
+    </script>
+</body>
+
+</html>
